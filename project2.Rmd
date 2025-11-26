@@ -1,0 +1,202 @@
+---
+title: "Business Data Analysis Report"
+subtitle: "CSV Import and Data Cleaning"
+author: "Nemo Menzies--657489662"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Code Block {-}
+
+```{r}
+# Create sample regional sales data
+regional_sales <- data.frame(
+  region = c("North", "South", "East", "West", "North", "South", "East", "West",
+             "North", "South", "East", "West", "North", "South", "East", 
+             "North", "South","North"),  
+  quarter = c(rep(c("Q1", "Q2", "Q3", "Q4"), each = 4), "Q4", "Q4"),
+  revenue = c(125000, 98000, 115000, 102000, 
+              138000, 105000, 128000, 118000,
+              142000, 89000, 135000, 125000,
+              155000, 112000, 148000, 165000, 
+              120000, 91250),
+  customers = c(450, 380, 420, 395, 
+                485, 415, 465, 445,
+                520, 350, 485, 470,
+                575, 425, 545, 590, 435,324)
+)
+```
+
+## Question 1
+
+### Q 1.a
+
+There are 18 observations over 4 variables. The two data types are characters and numbers.
+
+```{r}
+str(regional_sales)
+```
+
+### Q 1.b
+
+The revenues ranges from a minimum of 89000 and maximum of 165000. Based on the head data, the regions appear in order of North, South, East, then West.
+
+```{r}
+head(regional_sales)
+summary(regional_sales)
+```
+
+### Q 1.c
+
+Four unique regions and quarters are represented in the dataset.
+
+```{r}
+unique(regional_sales$quarter)
+unique(regional_sales$region)
+```
+
+### Q 1.d
+
+Business insights provided by the sum demonstrates the total outreach and overall demand.
+
+```{r}
+sum(regional_sales$customers)
+```
+
+## Question 2
+
+### Q 2.a
+
+No missing values in the dataset. It's important to check so business decisions can reflect what is actually shown.
+
+```{r}
+sum(is.na(regional_sales))
+```
+
+### Q 2.b
+
+Data is not distributed equally, meaning there could be regional differences/preferences, as well as increased influx for year-end clearance and holiday purchases.
+
+```{r}
+table(regional_sales$region)
+table(regional_sales$quarter)
+```
+
+### Q 2.c
+
+Quarter 3 in the South region shows concerning performance compared to the others.
+
+```{r}
+regional_sales[regional_sales$revenue < 90000, ]
+```
+
+## Question 3
+
+### Q 3.a
+
+The North and East regions had high performance, mainly in the third and fourth quarter.
+
+```{r}
+high_perf <- subset(regional_sales, revenue > 140000)
+high_perf
+nrow(high_perf)
+```
+
+### Q 3.b
+
+As mentioned earlier and now demonstrated again, year-end performance was impressive compared to other times of the year, likely due to year-end clearance and holiday sales.
+
+```{r}
+subset(regional_sales,
+       quarter == "Q4" &
+       revenue > 130000 & 
+       customers > 500,
+       select = c(region, revenue, customers))
+```
+
+### Q 3.c
+
+The North and East regions perform on the higher end compared to overall regional sales.
+
+
+```{r}
+north_east <- subset(regional_sales, region == "North" |
+                     region == "East")
+mean(north_east$revenue)
+mean(regional_sales$revenue)
+```
+
+### Q 3.d
+
+There were 4 concerning records, with the percentage below representing 4/18.
+
+```{r}
+regional_sales$flag <- regional_sales$revenue < 100000 | 
+                       regional_sales$customers < 400
+sum(regional_sales$flag)
+percentage <- round(mean(regional_sales$flag) * 100, 1)
+```
+
+The number of concerning records as a percentage is **`r percentage`**%.
+
+## Question 4
+
+### Q 4.a
+
+The north region was the most dominant in sales among other regions.
+
+```{r}
+aggregate(revenue ~ region,
+          data = regional_sales,
+          sum)
+```
+
+### Q 4.b
+
+As demonstrated, Q4 had the highest customer count, for reasons mentioned such as clearance and sales that may have happened during this quarter.
+
+```{r}
+avg_customer_count <- aggregate(customers ~ quarter,
+          data = regional_sales,
+          mean)
+
+avg_customer_count$customers <- round(avg_customer_count$customers, 0)
+
+avg_customer_count
+```
+
+## Question 5
+
+### Q 5.a
+
+```{r}
+total_revenue <- sum(regional_sales$revenue)
+avg_revenue_per_quarter <- aggregate(
+                           revenue ~ quarter,
+                           data = regional_sales,
+                           mean)
+num_high_perf <- sum(regional_sales$revenue > 140000)
+
+summary_table <- data.frame(
+  Metric = c("Total Revenue",
+             paste("Average Revenue -", avg_revenue_per_quarter$quarter),
+             "High-Performance Records"),
+  Amount = c(total_revenue, avg_revenue_per_quarter$revenue, num_high_perf)
+)
+
+knitr::kable(summary_table,
+             col.names = c("Business Metric", "Value"),
+             caption = "Comprehensive Business Summary")
+```
+
+### Q 5.b
+
+Based on the data presented, the North region was the most consistent performer, having many of the high performing revenues. Q4 was also the most dominant quarter, due to either year-end clearance, holiday sales, or seasonal appeal. Analyzing and supporting other quarters by trying to follow Q4 will be a requirement, as well as assessing the reasons for the North region leading the charts in revenue.

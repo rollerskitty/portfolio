@@ -1,0 +1,124 @@
+---
+title: "Business Insights Report"
+subtitle: Data Visualization and Interpretation
+author: "Nemo Menzies--657489662"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(ggplot2)
+
+business_data <- read.csv('business_performance.csv')
+```
+
+## Question 1
+
+### Q 1.a 
+
+Quarter and Channel both represent character data (so words).
+
+```{r}
+str(business_data)
+summary(business_data)
+range(business_data$revenue)
+```
+
+### Q 1.b
+
+Online is the clear winner for revenue, with the 3rd quarter typically having the most customers. 
+
+```{r}
+revenue_by_channel <- aggregate(revenue ~ channel,
+                                data = business_data,
+                                sum)
+
+avg_customers_quarter <- aggregate(customers ~ quarter,
+                                       data = business_data,
+                                       mean)
+
+avg_customers_quarter$customers <- round(avg_customers_quarter$customers, 0)
+
+revenue_by_channel
+avg_customers_quarter
+```
+
+### Q 1.c
+
+Online has the highest revenue per customer. This is most likely due to the ease of browsing, as well as potential pop-ups that convince customers to buy more.
+
+```{r}
+business_data$revenue_per_customer <- business_data$revenue / business_data$customers
+
+avg_customers <- aggregate(customers ~ channel,
+          data = business_data,
+          mean)
+
+avg_customers$customers <- round(avg_customers$customers, 0)
+
+avg_customers
+```
+
+## Question 2
+
+### Q 2.a
+
+Online should be getting further investments based on the bar chart representing its overwhelming success.
+
+```{r}
+# Calculate totals first
+channel_totals <- aggregate(revenue ~ channel, data = business_data, sum)
+# Then create the chart
+ggplot(channel_totals, aes(x = channel, y = revenue, fill = channel)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Total Revenue by Channel", 
+       x = "Sales Channel", y = "Revenue ($)") +
+  theme_classic()
+```
+
+### Q 2.b
+
+The Retail channel appears the most efficient at converting customers to revenue. Compare the concentration of the retail channel with the other two.
+
+```{r}
+ggplot(business_data, aes(x = customers, y = revenue, color = channel)) +
+  geom_point(size = 3) +
+  labs(title = "Customer Count vs Revenue by Channel",
+       x = "Number of Customers", y = "Revenue ($)") +
+  theme_minimal()
+```
+
+## Question 3
+
+### Q 3.a
+
+```{r}
+library(knitr)
+
+total_revenue <- aggregate(revenue ~ channel, data = business_data, FUN = sum, na.rm = TRUE)
+avg_customers <- aggregate(customers ~ channel, data = business_data, FUN = mean, na.rm = TRUE)
+avg_conversion_rate <- aggregate(conversion_rate ~ channel, data = business_data, FUN = mean, na.rm = TRUE)
+
+summary_table <- merge(merge(total_revenue, avg_customers, by = "channel"), avg_conversion_rate, by = "channel")
+
+colnames(summary_table) <- c("Channel", "Total Revenue ($)", "Avg Customers", "Avg Conv Rate")
+
+# To convert into a percent
+summary_table$`Avg Conv Rate` <- sprintf("%.2f%%", summary_table$`Avg Conv Rate`)
+
+kable(summary_table,
+      digits = c(NA, 0, 0, NA),
+      caption = "Channel Performance Summary")
+```
+
+### Q 3.b
+
+With retail having the best conversion rate of customers, figuring out how this was done should be top priority. Typically it's the customer-to-associate interactions that help facilitate retention via reminders, so maybe implementing a sign-up now and get a bonus item when shopping online or on mobile will increase conversion rate for these channels.
