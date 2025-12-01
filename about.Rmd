@@ -5,7 +5,7 @@ title: "About Me"
 
 ## Background
 
-I'm a second-year student at VIU, developing skills 
+I'm a third-year student at VIU, developing skills 
 in data analysis, business intelligence, and statistical computing.
 
 ## Skills & Tools
@@ -30,8 +30,8 @@ in data analysis, business intelligence, and statistical computing.
 
 ## Education
 
-**VIU** - E-Management Program  
-*Expected Graduation: [Year]*
+**VIU** - Financial Services Program  
+*Expected Graduation: [2027]*
 
 Relevant Coursework:
 
@@ -43,9 +43,9 @@ Relevant Coursework:
 
 Feel free to connect with me:
 
-- Email: [your.email@example.com](mailto:your.email@example.com)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
-- GitHub: [yourusername](https://github.com/yourusername)
+- Email: [your.email@example.com](mailto:nemomenzies@gmail.com)
+- LinkedIn: [Your Profile](www.linkedin.com/in/nemo-menzies-aa671a380)
+- GitHub: [yourusername](https://github.com/NemoMenzies)
 
 ---
 
